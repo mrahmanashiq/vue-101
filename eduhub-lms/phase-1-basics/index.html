@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduHub LMS - Phase 1</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .controls {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 15px;
+            font-size: 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            transition: border-color 0.3s;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 20px;
+            background: #f5f5f5;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .filter-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .filter-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .courses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+        }
+
+        .course-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+
+        .course-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+        }
+
+        .course-image {
+            height: 200px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 3rem;
+        }
+
+        .course-content {
+            padding: 25px;
+        }
+
+        .course-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .course-description {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .course-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .course-category {
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .course-duration {
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        .course-price {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .enroll-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .enroll-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .stats {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .stats h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+        }
+
+        .stat-item {
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .courses-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .filter-buttons {
+                justify-content: center;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="container">
+            <!-- Header Section -->
+            <div class="header">
+                <h1>{{ appTitle }}</h1>
+                <p>{{ appSubtitle }}</p>
+            </div>
+
+            <!-- Controls Section -->
+            <div class="controls">
+                <input 
+                    type="text" 
+                    class="search-box" 
+                    :placeholder="searchPlaceholder"
+                    v-model="searchQuery"
+                    @input="filterCourses"
+                >
+                
+                <div class="filter-buttons">
+                    <button 
+                        v-for="category in categories" 
+                        :key="category"
+                        class="filter-btn"
+                        :class="{ active: selectedCategory === category }"
+                        @click="filterByCategory(category)"
+                    >
+                        {{ category }}
+                    </button>
+                </div>
+            </div>
+
+            <!-- Courses Grid -->
+            <div class="courses-grid">
+                <div 
+                    v-for="course in filteredCourses" 
+                    :key="course.id"
+                    class="course-card"
+                    @click="enrollInCourse(course)"
+                >
+                    <div class="course-image">
+                        {{ course.icon }}
+                    </div>
+                    <div class="course-content">
+                        <h3 class="course-title">{{ course.title }}</h3>
+                        <p class="course-description">{{ course.description }}</p>
+                        
+                        <div class="course-meta">
+                            <span class="course-category">{{ course.category }}</span>
+                            <span class="course-duration">{{ course.duration }}</span>
+                        </div>
+                        
+                        <div class="course-price">${{ course.price }}</div>
+                        
+                        <button class="enroll-btn" @click.stop="enrollInCourse(course)">
+                            {{ course.enrolled ? 'Enrolled ✓' : 'Enroll Now' }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistics Section -->
+            <div class="stats">
+                <h3>Platform Statistics</h3>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-number">{{ totalCourses }}</div>
+                        <div class="stat-label">Total Courses</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">{{ enrolledCount }}</div>
+                        <div class="stat-label">Enrolled Courses</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">{{ totalStudents }}</div>
+                        <div class="stat-label">Students</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">{{ averageRating }}</div>
+                        <div class="stat-label">Average Rating</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { createApp } = Vue;
+
+        createApp({
+            data() {
+                return {
+                    appTitle: 'EduHub Learning Management System',
+                    appSubtitle: 'Discover, Learn, and Grow with Premium Courses',
+                    searchPlaceholder: 'Search for courses...',
+                    searchQuery: '',
+                    selectedCategory: 'All',
+                    totalStudents: 15420,
+                    averageRating: 4.8,
+                    courses: [
+                        {
+                            id: 1,
+                            title: 'Vue.js Complete Guide',
+                            description: 'Master Vue.js from basics to advanced concepts including Composition API, Vuex, and Vue Router.',
+                            category: 'Frontend',
+                            duration: '32 hours',
+                            price: 89,
+                            icon: '🚀',
+                            enrolled: false
+                        },
+                        {
+                            id: 2,
+                            title: 'React Masterclass',
+                            description: 'Build modern web applications with React, Redux, and advanced patterns.',
+                            category: 'Frontend',
+                            duration: '28 hours',
+                            price: 95,
+                            icon: '⚛️',
+                            enrolled: false
+                        },
+                        {
+                            id: 3,
+                            title: 'Node.js Backend Development',
+                            description: 'Create scalable backend applications with Node.js, Express, and MongoDB.',
+                            category: 'Backend',
+                            duration: '35 hours',
+                            price: 105,
+                            icon: '🟢',
+                            enrolled: false
+                        },
+                        {
+                            id: 4,
+                            title: 'Python Data Science',
+                            description: 'Learn data analysis, machine learning, and visualization with Python.',
+                            category: 'Data Science',
+                            duration: '40 hours',
+                            price: 120,
+                            icon: '🐍',
+                            enrolled: false
+                        },
+                        {
+                            id: 5,
+                            title: 'UI/UX Design Fundamentals',
+                            description: 'Design beautiful and user-friendly interfaces with modern design principles.',
+                            category: 'Design',
+                            duration: '25 hours',
+                            price: 75,
+                            icon: '🎨',
+                            enrolled: false
+                        },
+                        {
+                            id: 6,
+                            title: 'DevOps & Cloud Computing',
+                            description: 'Deploy and manage applications with Docker, Kubernetes, and AWS.',
+                            category: 'DevOps',
+                            duration: '45 hours',
+                            price: 135,
+                            icon: '☁️',
+                            enrolled: false
+                        },
+                        {
+                            id: 7,
+                            title: 'Mobile App Development',
+                            description: 'Build cross-platform mobile apps with React Native and Flutter.',
+                            category: 'Mobile',
+                            duration: '38 hours',
+                            price: 110,
+                            icon: '📱',
+                            enrolled: false
+                        },
+                        {
+                            id: 8,
+                            title: 'Cybersecurity Essentials',
+                            description: 'Learn about network security, ethical hacking, and data protection.',
+                            category: 'Security',
+                            duration: '30 hours',
+                            price: 125,
+                            icon: '🔒',
+                            enrolled: false
+                        }
+                    ],
+                    filteredCourses: []
+                }
+            },
+            computed: {
+                categories() {
+                    const cats = ['All', ...new Set(this.courses.map(course => course.category))];
+                    return cats;
+                },
+                totalCourses() {
+                    return this.courses.length;
+                },
+                enrolledCount() {
+                    return this.courses.filter(course => course.enrolled).length;
+                }
+            },
+            methods: {
+                filterCourses() {
+                    let filtered = this.courses;
+                    
+                    // Filter by search query
+                    if (this.searchQuery) {
+                        filtered = filtered.filter(course => 
+                            course.title.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+                            course.description.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+                            course.category.toLowerCase().includes(this.searchQuery.toLowerCase())
+                        );
+                    }
+                    
+                    // Filter by category
+                    if (this.selectedCategory !== 'All') {
+                        filtered = filtered.filter(course => course.category === this.selectedCategory);
+                    }
+                    
+                    this.filteredCourses = filtered;
+                },
+                filterByCategory(category) {
+                    this.selectedCategory = category;
+                    this.filterCourses();
+                },
+                enrollInCourse(course) {
+                    course.enrolled = !course.enrolled;
+                    const message = course.enrolled ? 
+                        `Successfully enrolled in "${course.title}"! 🎉` : 
+                        `Unenrolled from "${course.title}"`;
+                    alert(message);
+                }
+            },
+            mounted() {
+                this.filteredCourses = this.courses;
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>
